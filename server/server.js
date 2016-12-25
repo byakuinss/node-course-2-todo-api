@@ -1,5 +1,6 @@
-var express = require('express');
-var bodyParser = require('body-parser'); //take json to request object
+const _ = require('lodash');
+const express = require('express');
+const bodyParser = require('body-parser'); //take json to request object
 
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./modules/todo');
@@ -73,6 +74,37 @@ app.delete('/todos/:id', (req, res) => {
 app.listen(port, () => {
 	console.log(`Started on port ${port}`);
 });
+
+app.patch('/todos/:id', (req, res) => {
+	var id = req.params.id;
+	//choose the object in request body and save into body object
+	var body = _.pick(req.body, ['text', 'completed']);
+
+	if(!ObjectID.isValid(id)){
+		console.log('id is not valid.');
+		return res.status(404).send();
+	}
+
+	if(_.isBoolean(body.completed) && body.completed){
+		//return javascript time
+		body.completedAt = new Date().getTime(); 
+	} else {
+		body.completed = false;
+		body.completedAt = null;
+	}
+
+	Todo.findOneAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+		if (!todo) {
+			return res.status(404).send();
+		}
+
+		res.send({todo});
+	}).catch((e) => {
+		res.status(400).send();
+	});
+
+})
+
 
 
 module.exports = {app};
