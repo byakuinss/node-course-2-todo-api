@@ -74,10 +74,6 @@ app.delete('/todos/:id', (req, res) => {
 });
 
 
-app.listen(port, () => {
-	console.log(`Started on port ${port}`);
-});
-
 app.patch('/todos/:id', (req, res) => {
 	var id = req.params.id;
 	//choose the object in request body and save into body object
@@ -107,6 +103,33 @@ app.patch('/todos/:id', (req, res) => {
 	});
 
 })
+
+// POST /users
+// use _.pick and patch, save
+
+app.post('/users', (req, res) => {
+	var body = _.pick(req.body, ['email', 'password']);
+	var user = new User(body);
+
+	// model method
+	//User.findByToken
+
+	// instance method
+	//user.generateAuthToken	
+
+	user.save().then(() => {
+		return user.generateAuthToken();
+	}).then((token) => {
+		res.header('x-auth', token).send(user);
+	}).catch((e) => {
+		res.status(400).send(e);
+	});
+})
+
+
+app.listen(port, () => {
+	console.log(`Started on port ${port}`);
+});
 
 
 
