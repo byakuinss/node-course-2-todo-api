@@ -153,6 +153,29 @@ app.listen(port, () => {
     console.log(`Started on port ${port}`);
 });
 
+// app.delete('/todos/:id', (req, res) => {
+//     var id = req.params.id;
 
+//     if (!ObjectID.isValid(id)) {
+//         console.log('id is not valid.');
+//         return res.status(404).send();
+//     }
+
+//     Todo.findByIdAndRemove(id).then((todo) => {
+//         if (!todo) {
+//             return res.status(404).send();
+//         }
+//         res.send({ todo });
+//     }).catch((e) => console.log(e));
+// });
+
+app.delete('/users/me/token', authenticate, (req, res) => {
+    //call instance method
+    req.user.removeToken(req.token).then(() => {
+        res.status(200).send();
+    }, () => {
+        res.status(400).send();
+    });
+});
 
 module.exports = { app };
